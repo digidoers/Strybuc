@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "strybuc_flutter" "\0"
+            VALUE "FileDescription", "strybuc" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "strybuc_flutter" "\0"
+            VALUE "InternalName", "strybuc" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2024 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "strybuc_flutter.exe" "\0"
-            VALUE "ProductName", "strybuc_flutter" "\0"
+            VALUE "OriginalFilename", "strybuc.exe" "\0"
+            VALUE "ProductName", "strybuc" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

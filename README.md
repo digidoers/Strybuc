@@ -1,3 +1,3 @@
-# strybuc_flutter
+# Strybuc
 
 A new Flutter project.

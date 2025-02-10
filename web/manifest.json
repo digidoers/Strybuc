@@ -1,6 +1,6 @@
 {
-    "name": "strybuc_flutter",
-    "short_name": "strybuc_flutter",
+    "name": "strybuc",
+    "short_name": "strybuc",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
