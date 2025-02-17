@@ -93,7 +93,9 @@ class SignUpScreen extends StatelessWidget {
                   const SizedBox(height: 20),
 
                   // Customer Sign-in Button
-                  RoundedButton(text: 'Customer Sign Up', onPressed: () {}),
+                  RoundedButton(text: 'Customer Sign Up', onPressed: () {
+                    context.go('/');
+                  }),
                   const SizedBox(height: 20),
 
                   // Divider with OR

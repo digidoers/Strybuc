@@ -20,6 +20,7 @@ import 'package:strybuc/screens/shop.dart';
 import 'package:strybuc/screens/sign_up.dart';
 import 'package:strybuc/screens/splash_screen.dart';
 import 'package:strybuc/screens/thank_you.dart';
+import 'package:strybuc/screens/android_distance_tracking_screen.dart';
 
 GoRouter createRouter(bool isFirstLaunch) {
   return GoRouter(
@@ -173,24 +174,24 @@ GoRouter createRouter(bool isFirstLaunch) {
                 ),
               ],
             ),
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  name: 'photograph_parts_distance_tracking',
-                  path: '/photograph_parts/distance_tracking',
-                  builder: (BuildContext context, GoRouterState state) {
-                    // detact the platform is it android or ios and return the correct screen
-                    return Platform.isAndroid
-                        ? AndroidDistanceTrackingScreen(
-                            key: Key('photograph_parts_distance_tracking'),
-                          )
-                        : DistanceTrackingScreen(
-                            key: Key('photograph_parts_distance_tracking'),
-                          );
-                  },
-                ),
-              ],
-            ),
+            // StatefulShellBranch(
+            //   routes: [
+            //     GoRoute(
+            //       name: 'photograph_parts_distance_tracking',
+            //       path: '/photograph_parts/distance_tracking',
+            //       builder: (BuildContext context, GoRouterState state) {
+            //         // detact the platform is it android or ios and return the correct screen
+            //         // return Platform.isAndroid
+            //         //     ? AndroidDistanceTrackingScreen(
+            //         //         key: Key('photograph_parts_distance_tracking'),
+            //         //       )
+            //         //     : DistanceTrackingScreen(
+            //         //         key: Key('photograph_parts_distance_tracking'),
+            //         //       );
+            //       },
+            //     ),
+            //   ],
+            // ),
           ],
         )
       ]);

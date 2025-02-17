@@ -86,7 +86,9 @@ class GuestLoginScreen extends StatelessWidget {
                   const SizedBox(height: 20),
               
                   // Customer Sign-in Button
-                  RoundedButton(text: 'Guest Sign In', onPressed: () {}),
+                  RoundedButton(text: 'Guest Sign In', onPressed: () {
+                     context.go('/');
+                  }),
                   const SizedBox(height: 20),
               
               

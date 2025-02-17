@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:strybuc/theme.dart';
 import 'package:strybuc/widgets/header.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+//import 'package:strybuc/services/api_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -58,8 +60,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 20),
               TextButton(
-                onPressed: () => context.go('/login'),
-                child: Text(
+                onPressed: () async {
+                  // Remove the access token
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.remove('access_token');
+
+                  // Navigate to the login screen
+                  context.go('/login');
+                },
+                  child: Text(
                   'Log out',
                   style: GoogleFonts.inter(
                     fontSize: 14,

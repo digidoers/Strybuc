@@ -3,9 +3,70 @@ import 'package:go_router/go_router.dart';
 import 'package:strybuc/theme.dart';
 import 'package:strybuc/widgets/logo.dart';
 import 'package:strybuc/widgets/rounded_button.dart';
+import 'package:strybuc/services/api_service.dart'; // Import your API service
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController _customerIdController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final ApiService _apiService = ApiService();  // Instantiate your API service
+
+  // Add a loading indicator
+  bool _isLoading = false;
+
+  Future<void> _login() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final login = _customerIdController.text;
+    final password = _passwordController.text;
+
+    try {
+      final response = await _apiService.login(login, password);
+
+      // Assuming response contains a field `success` which is true on successful login
+      if (response['customer'].isNotEmpty) {
+        // Navigate to Home Screen
+        context.go('/');
+      } else {
+        // Show an error message if login fails
+        _showError('Invalid credentials');
+      }
+    } catch (e) {
+      _showError('An error occurred: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _showError(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,30 +75,23 @@ class LoginScreen extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Container(
-            // margin: EdgeInsets.only(top: 80),
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 100),
-              
                   // Logo
                   Center(child: Logo()),
-              
                   const SizedBox(height: 40),
-              
                   // Sign-in Title
                   Text(
                     'Sign in',
                     style: Theme.of(context).textTheme.headlineLarge,
                   ),
-              
                   const SizedBox(height: 10),
-              
                   // Sign-up Link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
-                    // spacing: 0,
                     children: [
                       Text(
                         "Don't have an account?",
@@ -52,22 +106,20 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-              
                   const SizedBox(height: 20),
-              
                   // Customer ID Input
                   TextField(
+                    controller: _customerIdController,
                     style: Theme.of(context).textTheme.headlineMedium,
                     decoration: InputDecoration(
                       hintText: 'Customer ID',
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                     ),
                   ),
-              
                   const SizedBox(height: 20),
-              
                   // Password Input
                   TextField(
+                    controller: _passwordController,
                     obscureText: true,
                     style: Theme.of(context).textTheme.headlineMedium,
                     decoration: InputDecoration(
@@ -75,13 +127,13 @@ class LoginScreen extends StatelessWidget {
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                     ),
                   ),
-              
                   const SizedBox(height: 20),
-              
                   // Customer Sign-in Button
-                  RoundedButton(text: 'Customer Sign In', onPressed: () => context.push('/')),
+                  RoundedButton(
+                    text: _isLoading ? 'Signing In...' : 'Customer Sign In',
+                    onPressed: _isLoading ? null : _login,
+                  ),
                   const SizedBox(height: 20),
-              
                   // Divider with OR
                   Row(
                     children: [
@@ -94,9 +146,7 @@ class LoginScreen extends StatelessWidget {
                       Expanded(child: Divider()),
                     ],
                   ),
-              
                   const SizedBox(height: 20),
-              
                   // Sign in as Guest Button
                   RoundedButton(
                     text: 'Sign in as Guest',
