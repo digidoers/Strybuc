@@ -24,8 +24,8 @@ dependencies:
   shared_preferences: ^2.3.5
   http: ^1.1.0
  #  arcore_flutter_plugin: ^0.1.0
- # ar_flutter_plugin: ^0.6.2
-  ar_flutter_plugin: ^0.7.0
+  ar_flutter_plugin: ^0.6.2
+ # ar_flutter_plugin: ^0.7.0
 
 dev_dependencies:
   flutter_test:

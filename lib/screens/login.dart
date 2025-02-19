@@ -21,26 +21,39 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
 
   Future<void> _login() async {
+    
+    final login = _customerIdController.text;
+    final password = _passwordController.text;
+
+    // Client-side validation for empty fields
+    if (login.isEmpty || password.isEmpty) {
+      _showError('Please fill in both fields');
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
 
-    final login = _customerIdController.text;
-    final password = _passwordController.text;
-
-    try {
+     try {
       final response = await _apiService.login(login, password);
-
-      // Assuming response contains a field `success` which is true on successful login
-      if (response['customer'].isNotEmpty) {
+      // Ensure response is not null and contains 'customer'
+      if (response != null && response.containsKey('customer') && response['customer'].isNotEmpty) {
         // Navigate to Home Screen
         context.go('/');
       } else {
         // Show an error message if login fails
-        _showError('Invalid credentials');
+        _showError('Invalid credentials. Please try again.');
       }
     } catch (e) {
-      _showError('An error occurred: $e');
+      final errorMsg = e.toString();
+      if (errorMsg.contains('Invalid credentials')) {
+        _showError('Invalid credentials. Please check your login details.');
+      } else if (errorMsg.contains('Request timed out') || errorMsg.contains('SocketException')) {
+        _showError('Network issue. Please check your internet connection.');
+      } else {
+        _showError('An unexpected error occurred. Please try again.');
+      }
     } finally {
       setState(() {
         _isLoading = false;

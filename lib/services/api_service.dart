@@ -68,6 +68,7 @@ class ApiService {
   // Authenticate user with login and password using the stored access token
   Future<Map<String, dynamic>> login(String login, String password) async {
     try {
+      final prefs = await SharedPreferences.getInstance();
       // Ensure you have the access token available
       final String? accessToken = await getAccessToken();
 
@@ -99,8 +100,32 @@ class ApiService {
           throw Exception("Request timed out during logins");
         },
       );
+      
       // Handle the response from the login API
       if (response.body.isNotEmpty) {
+        prefs.setString('login', login);
+
+        // Save customer record on login
+        final customerData = await customer(login);
+        if (customerData.isNotEmpty) {
+          final customer = customerData.first;
+
+          prefs.setString('customer_name', customer['customer_name'] ?? '');
+          prefs.setString('customer_email_address', customer['customer_email_address'] ?? '');
+          prefs.setString('customer_phone', customer['customer_phone'] ?? '');
+          prefs.setString('customer_company_cu', customer['customer_company_cu'] ?? '');
+        }
+
+        // Save customer record on login
+        final salesCustomerData = await salesCustomer();
+        if (salesCustomerData.isNotEmpty) {
+          final salesCustomer = salesCustomerData.first;
+          prefs.setString('salesman_email_address', salesCustomer['salesman_email_address'] ?? '');
+        }  
+
+      // Retrieve and print the saved email
+      final salesmanEmailAddress = prefs.getString('salesman_email_address');
+      print('Retrieved salesman_email_address: $salesmanEmailAddress');
         // Assuming the API returns a JSON response
         return json.decode(response.body);
       } else {
@@ -112,50 +137,82 @@ class ApiService {
   }
 
   // Authenticate user with login and password using the stored access token
-  Future<Map<String, dynamic>> customer() async {
-  try {
-    // Ensure you have the access token available
-    final String? accessToken = await getAccessToken();
+  Future<List<Map<String, dynamic>>> customer(String login) async {
+    try {
+      final String? accessToken = await getAccessToken();
+      if (accessToken == null) {
+        throw Exception('No access token available');
+      }
 
-    // If no token is available, throw an error
-    if (accessToken == null) {
-      throw Exception('No access token available');
+      final Map<String, String> queryParams = {
+        'query': 'FOR EACH customer NO-LOCK WHERE customer.company_cu  = "ST" AND customer.is_deleted = no AND customer = "$login"',
+        'columns': 'customer.name,customer.email_address,customer.phone,customer.company_cu',
+      };
+
+      final Uri uri = Uri.parse(customerApiUrl).replace(queryParameters: queryParams);
+
+      final response = await http.post(
+        uri,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          'authorization': accessToken,
+          'cache-control': 'no-cache',
+        },
+      ).timeout(
+        const Duration(seconds: 60),
+        onTimeout: () {
+          throw Exception("Request timed out during customer data");
+        },
+      );
+
+      if (response.body.isNotEmpty) {
+        // Here you can safely decode the response as a List<Map<String, dynamic>>
+        return List<Map<String, dynamic>>.from(json.decode(response.body));
+      } else {
+        throw Exception('Failed to fetch customer data: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error occurred during customer data fetch: $e');
     }
-
-    // Prepare the login request parameters
-    final Map<String, String> queryParams = {
-      'query': 'FOR EACH customer NO-LOCK WHERE customer.company_cu  = "ST" AND customer.is_deleted = no AND customer ="16666"',
-      'columns': 'customer.name,customer.email_address,customer.phone,customer.company_cu',
-    };
-
-    // Build the URI for the authentication API call
-    final Uri uri = Uri.parse(customerApiUrl).replace(queryParameters: queryParams);
-
-    // Send the POST request to the authenticate API
-    final response = await http.post(
-      uri,
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        'authorization': accessToken,  // Use the stored access token for authorization
-        'cache-control': 'no-cache',
-      },
-    ).timeout(
-      const Duration(seconds: 120),  // Timeout for this request as well
-      onTimeout: () {
-        throw Exception("Request timed out during login");
-      },
-    );
-
-    // Handle the response from the login API
-    if (response.body.isNotEmpty) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to fetch customer data: ${response.body}');
-    }
-  } catch (e) {
-    throw Exception('Error occurred during customer data fetch: $e');
   }
-}
+
+  Future<List<Map<String, dynamic>>> salesCustomer() async {
+    try {
+      final String? accessToken = await getAccessToken();
+      if (accessToken == null) {
+        throw Exception('No access token available');
+      }
+
+      final Map<String, String> queryParams = {
+        'query': 'FOR EACH salesman NO-LOCK WHERE salesman = "145"',
+        'columns': 'salesman.email_address',
+      };
+
+      final Uri uri = Uri.parse(customerApiUrl).replace(queryParameters: queryParams);
+
+      final response = await http.post(
+        uri,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          'authorization': accessToken,
+          'cache-control': 'no-cache',
+        },
+      ).timeout(
+        const Duration(seconds: 60),
+        onTimeout: () {
+          throw Exception("Request timed out during sales customer data");
+        },
+      );
+
+      if (response.body.isNotEmpty) {
+        return List<Map<String, dynamic>>.from(json.decode(response.body));
+      } else {
+        throw Exception('Failed to fetch sales customer data: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error occurred during sales customer data fetch: $e');
+    }
+  }
 
 
 

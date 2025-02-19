@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:strybuc/theme.dart';
 import 'package:strybuc/widgets/header.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-//import 'package:strybuc/services/api_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -14,15 +13,40 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final TextEditingController nameController =
-      TextEditingController(text: 'Andre Smith');
-  final TextEditingController companyController =
-      TextEditingController(text: 'Company Name');
-  final TextEditingController emailController =
-      TextEditingController(text: 'AndreSmith@gmail.com');
-  final TextEditingController phoneController =
-      TextEditingController(text: '949-584-9951');
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController companyController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
 
+  bool hasCompany = false; // Track if company has a value
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCustomerData();
+  }
+
+  // Fetch customer data and update the controllers
+  Future<void> _fetchCustomerData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? customerName = prefs.getString('customer_name') ?? '';
+      String? customerEmail = prefs.getString('customer_email_address') ?? '';
+      String? customerPhone = prefs.getString('customer_phone') ?? '';
+      String? customerCompany = prefs.getString('customer_company_cu') ?? '';
+      if (customerName.isNotEmpty) {
+        setState(() {
+          nameController.text = customerName;
+          emailController.text = customerEmail;
+          phoneController.text = customerPhone;
+          companyController.text = customerCompany;
+          hasCompany = customerCompany.isNotEmpty; // Update visibility flag
+        });
+      }
+    } catch (e) {
+      print('Error fetching customer data: $e');
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               SizedBox(height: 16),
               Text(
-                'My Profile',
+                hasCompany ? 'My Profile' : 'Guest Profile',
                 style: AppTheme.screenTitleTextStyle,
               ),
               const SizedBox(height: 20),
@@ -43,11 +67,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 label: 'Name',
                 controller: nameController,
               ),
-              const SizedBox(height: 20),
-              _buildLabeledTextField(
-                label: 'Company',
-                controller: companyController,
-              ),
+              if (hasCompany)...[
+                const SizedBox(height: 20),
+                _buildLabeledTextField(label: 'Company', controller: companyController),
+              ],
               const SizedBox(height: 20),
               _buildLabeledTextField(
                 label: 'Email',
@@ -63,12 +86,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onPressed: () async {
                   // Remove the access token
                   final prefs = await SharedPreferences.getInstance();
-                  await prefs.remove('access_token');
+                  await prefs.clear();
 
                   // Navigate to the login screen
                   context.go('/login');
                 },
-                  child: Text(
+                child: Text(
                   'Log out',
                   style: GoogleFonts.inter(
                     fontSize: 14,
@@ -104,7 +127,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(horizontal: 12),
           ),
-        )
+        ),
       ],
     );
   }
