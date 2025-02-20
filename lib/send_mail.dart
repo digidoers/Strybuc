@@ -1,5 +1,6 @@
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
+import 'package:strybuc/config.dart';
 
 Future<void> sendEmailSMTP({
   required String firstName,
@@ -7,10 +8,13 @@ Future<void> sendEmailSMTP({
   required String email,
   required String messageData,
 }) async {
-  final smtpServer = gmail('info.digidoers@gmail.com', 'vceyaezfldwetjdq'); // Use an App Password
+  final String salesEmail = AppConfig.salesEmail;
+  final String appPassword = AppConfig.appPassword;
+
+  final smtpServer = gmail(salesEmail, appPassword); // Use an App Password
 
   final message = Message()
-    ..from = Address('info.digidoers@gmail.com', 'Strybuc')
+    ..from = Address(salesEmail, 'Strybuc')
     ..recipients.add('digitester@yopmail.com')
     ..subject = 'Contact Sales Rep Inquiry'
     ..text = '''
