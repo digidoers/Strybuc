@@ -123,9 +123,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const SizedBox(height: 8),
         TextField(
           controller: controller,
+          enabled: false, // Disable editing
           style: Theme.of(context).textTheme.headlineMedium,
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+            disabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.grey), // Optional: Change border color
+            ),
           ),
         ),
       ],
