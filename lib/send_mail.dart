@@ -12,7 +12,7 @@ Future<void> sendEmailSMTP({
   final String salesEmail = AppConfig.salesEmail;
   final String appPassword = AppConfig.appPassword;
   final prefs = await SharedPreferences.getInstance();
-  final String customerId = prefs.getString('login') ?? 'Guest'; // Ensure correct key is used
+  final String customerId = prefs.getString('login') ?? 'Guest User'; // Ensure correct key is used
   final smtpServer = gmail(salesEmail, appPassword); // Use an App Password
 
   final message = Message()
