@@ -9,7 +9,7 @@ class PhotoGalleryRepScreen extends StatefulWidget {
 }
 
 class _PhotoGalleryRepScreenState extends State<PhotoGalleryRepScreen> {
-  final List<String> images = List.generate(6, (_) => 'assets/images/first.png');
+  final List<String> images = List.generate(3, (_) => 'assets/images/first.png');
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class _PhotoGalleryRepScreenState extends State<PhotoGalleryRepScreen> {
           child: Column(
             children: [
               const SizedBox(height: 16),
-              
+
               // Gallery Grid
               Expanded(
                 child: GridView.builder(
@@ -33,20 +33,44 @@ class _PhotoGalleryRepScreenState extends State<PhotoGalleryRepScreen> {
                     crossAxisSpacing: 8.0,
                     mainAxisSpacing: 8.0,
                   ),
-                  itemCount: images.length,
+                  itemCount: images.length + 1, // +1 for the Camera Box
                   itemBuilder: (context, index) {
-                    return ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.asset(
-                        images[index],
-                        fit: BoxFit.cover,
-                      ),
-                    );
+                    if (index == 0) {
+                      // First box: Black background with Camera Icon and Text
+                      return GestureDetector(
+                        onTap: () {
+                          // Handle camera functionality here
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(Icons.camera_alt, color: Colors.white, size: 40),
+                              SizedBox(height: 8),
+                              Text('Camera', style: TextStyle(color: Colors.white, fontSize: 16)),
+                            ],
+                          ),
+                        ),
+                      );
+                    } else {
+                      // Other Images
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.asset(
+                          images[index - 1], // Adjust index to match images list
+                          fit: BoxFit.cover,
+                        ),
+                      );
+                    }
                   },
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 10),
 
               // Send Images Button
               Center(
@@ -58,7 +82,7 @@ class _PhotoGalleryRepScreenState extends State<PhotoGalleryRepScreen> {
                   },
                   icon: const Icon(Icons.send),
                   label: Text(
-                    'Send Images',
+                    'Send 6 Images',
                     style: AppTheme.buttonTextStyle,
                   ),
                   style: ElevatedButton.styleFrom(

@@ -34,7 +34,6 @@ GoRouter createRouter(bool isFirstLaunch) {
         GoRoute(
           path: '/login',
           builder: (context, state) => const LoginScreen(),
-          //builder: (context, state) => const PhotoGalleryRepScreen(),
         ),
         GoRoute(
           path: '/guest_login',

@@ -1,6 +1,7 @@
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:strybuc/config.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> sendEmailSMTP({
   required String firstName,
@@ -10,13 +11,14 @@ Future<void> sendEmailSMTP({
 }) async {
   final String salesEmail = AppConfig.salesEmail;
   final String appPassword = AppConfig.appPassword;
-
+  final prefs = await SharedPreferences.getInstance();
+  final String customerId = prefs.getString('login') ?? 'Guest'; // Ensure correct key is used
   final smtpServer = gmail(salesEmail, appPassword); // Use an App Password
 
   final message = Message()
     ..from = Address(salesEmail, 'Strybuc')
     ..recipients.add('digitester@yopmail.com')
-    ..subject = 'Contact Sales Rep Inquiry'
+    ..subject = 'Strybuc App - Customer ID # $customerId'
     ..text = '''
     Hello Team,  
 
