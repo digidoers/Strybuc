@@ -20,11 +20,11 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             children: [
               const SizedBox(height: 15),
-      
+
               Logo(),
-      
+
               const SizedBox(height: 30),
-      
+
               Expanded(
                 child: GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -68,9 +68,9 @@ class HomeScreen extends StatelessWidget {
                         'route': '/exclusive_offers',
                       },
                     ];
-      
+
                     final card = cards[index];
-      
+
                     return _buildCard(
                       card['title'] as String,
                       card['icon'] as String,
