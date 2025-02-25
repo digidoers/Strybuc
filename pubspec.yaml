@@ -28,6 +28,8 @@ dependencies:
   http: ^1.1.0  # Added for API calls
 # connectivity_plus: ^5.0.1  # Added for network connectivity checks
 
+  mailer: ^6.4.1
+  path_provider: ^2.1.5
   # Permissions
 #  permission_handler: ^11.0.1  # Added for handling camera and other permissions
 
