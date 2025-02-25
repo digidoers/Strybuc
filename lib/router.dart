@@ -67,8 +67,8 @@ GoRouter createRouter(bool isFirstLaunch) {
                   name: 'home',
                   path: '/',
                   builder: (BuildContext context, GoRouterState state) {
-                    //return const HomeScreen();
-                    return const PhotoGalleryRepScreen();
+                    return const HomeScreen();
+                    //return const PhotoGalleryRepScreen();
                   },
                 ),
               ],
