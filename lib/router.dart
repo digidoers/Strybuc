@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:strybuc/layout.dart';
 import 'package:strybuc/screens/contact_sales_rep.dart';
+import 'package:strybuc/screens/photograph_parts/photo_gallery.dart';
 import 'package:strybuc/screens/exclusive_offers.dart';
 import 'package:strybuc/screens/forms.dart';
 import 'package:strybuc/screens/guest_login.dart';
@@ -32,6 +33,8 @@ GoRouter createRouter(bool isFirstLaunch) {
         GoRoute(
           path: '/login',
           builder: (context, state) => const LoginScreen(),
+          //builder: (context, state) => const PhotoGalleryRepScreen(),
+          //builder: (context, state) => const SendRequestScreen(),
         ),
         GoRoute(
           path: '/guest_login',
@@ -65,6 +68,7 @@ GoRouter createRouter(bool isFirstLaunch) {
                   path: '/',
                   builder: (BuildContext context, GoRouterState state) {
                     return const HomeScreen();
+                    //return const PhotoGalleryRepScreen();
                   },
                 ),
               ],
@@ -127,6 +131,18 @@ GoRouter createRouter(bool isFirstLaunch) {
               ],
             ),
             StatefulShellBranch(
+            routes: [
+              GoRoute(
+                name: 'photo_gallery_rep',
+                path: '/photo_gallery_rep',
+                builder: (BuildContext context, GoRouterState state) {
+                  return const PhotoGalleryRepScreen(
+                      key: Key('photo_gallery_rep'));
+                },
+              ),
+            ],
+          ),
+            StatefulShellBranch(
               routes: [
                 GoRoute(
                   name: 'exclusive_offers',
@@ -167,7 +183,7 @@ GoRouter createRouter(bool isFirstLaunch) {
                   path: '/photograph_parts/send_request',
                   builder: (BuildContext context, GoRouterState state) {
                     return const SendRequestScreen(
-                      key: Key('photograph_parts_send_request'),
+                      key: Key('photograph_parts_send_request'), images: [],
                     );
                   },
                 ),

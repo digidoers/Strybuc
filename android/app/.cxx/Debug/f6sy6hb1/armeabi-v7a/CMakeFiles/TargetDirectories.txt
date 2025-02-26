@@ -1,0 +1,2 @@
+E:/xampp/htdocs/Strybuc/android/app/.cxx/Debug/f6sy6hb1/armeabi-v7a/CMakeFiles/edit_cache.dir
+E:/xampp/htdocs/Strybuc/android/app/.cxx/Debug/f6sy6hb1/armeabi-v7a/CMakeFiles/rebuild_cache.dir
