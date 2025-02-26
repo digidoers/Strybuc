@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:strybuc/layout.dart';
 import 'package:strybuc/screens/contact_sales_rep.dart';
-import 'package:strybuc/screens/photo_gallery.dart';
+import 'package:strybuc/screens/photograph_parts/photo_gallery.dart';
 import 'package:strybuc/screens/exclusive_offers.dart';
 import 'package:strybuc/screens/forms.dart';
 import 'package:strybuc/screens/guest_login.dart';
@@ -12,8 +12,8 @@ import 'package:strybuc/screens/home.dart';
 import 'package:strybuc/screens/library.dart';
 import 'package:strybuc/screens/live_chat.dart';
 import 'package:strybuc/screens/login.dart';
-//import 'package:strybuc/screens/photograph_parts/android/distance_tracking.dart';
-//import 'package:strybuc/screens/photograph_parts/ios/ios_distance_tracking.dart';
+import 'package:strybuc/screens/photograph_parts/android/distance_tracking.dart';
+import 'package:strybuc/screens/photograph_parts/ios/ios_distance_tracking.dart';
 import 'package:strybuc/screens/photograph_parts/instructions.dart';
 import 'package:strybuc/screens/photograph_parts/send_request.dart';
 import 'package:strybuc/screens/profile.dart';
@@ -183,30 +183,30 @@ GoRouter createRouter(bool isFirstLaunch) {
                   path: '/photograph_parts/send_request',
                   builder: (BuildContext context, GoRouterState state) {
                     return const SendRequestScreen(
-                      key: Key('photograph_parts_send_request'),
+                      key: Key('photograph_parts_send_request'), images: [],
                     );
                   },
                 ),
               ],
             ),
-            // StatefulShellBranch(
-            //   routes: [
-            //     GoRoute(
-            //       name: 'photograph_parts_distance_tracking',
-            //       path: '/photograph_parts/distance_tracking',
-            //       builder: (BuildContext context, GoRouterState state) {
-            //         // detact the platform is it android or ios and return the correct screen
-            //         return Platform.isAndroid
-            //             ? AndroidDistanceTrackingScreen(
-            //                 key: Key('photograph_parts_distance_tracking'),
-            //               )
-            //             : DistanceTrackingScreen(
-            //                 key: Key('photograph_parts_distance_tracking'),
-            //               );
-            //       },
-            //     ),
-            //   ],
-            // ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  name: 'photograph_parts_distance_tracking',
+                  path: '/photograph_parts/distance_tracking',
+                  builder: (BuildContext context, GoRouterState state) {
+                    // detact the platform is it android or ios and return the correct screen
+                    return Platform.isAndroid
+                        ? AndroidDistanceTrackingScreen(
+                            key: Key('photograph_parts_distance_tracking'),
+                          )
+                        : DistanceTrackingScreen(
+                            key: Key('photograph_parts_distance_tracking'),
+                          );
+                  },
+                ),
+              ],
+            ),
           ],
         )
       ]);
