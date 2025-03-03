@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:strybuc/screens/photograph_parts/full_image_screen.dart';
+import 'package:go_router/go_router.dart';
 import 'package:strybuc/theme.dart'; // Assuming AppTheme is defined here
 import 'package:strybuc/screens/photograph_parts/send_request.dart';
 
@@ -12,12 +12,12 @@ class PhotoGalleryRepScreen extends StatefulWidget {
 
 class _PhotoGalleryRepScreenState extends State<PhotoGalleryRepScreen> {
   List<String> images = [
-    'assets/images/full_first.png',
-    'assets/images/full_first.png',
-    'assets/images/full_first.png',
-    'assets/images/full_first.png',
-    'assets/images/full_first.png',
-    'assets/images/full_first.png',
+    'assets/images/one.png',
+    'assets/images/two.png',
+    'assets/images/three.png',
+    'assets/images/four.png',
+    'assets/images/five.png',
+    'assets/images/six.png',
   ];
 
   @override
@@ -63,16 +63,11 @@ class _PhotoGalleryRepScreenState extends State<PhotoGalleryRepScreen> {
                     int imageIndex = images.length < 6 ? index - 1 : index;
                     return GestureDetector(
                       onTap: () async {
-                        final bool? isDeleted = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => FullImageScreen(
-                              imagePath: images[imageIndex],
-                              index: imageIndex,
-                            ),
-                            fullscreenDialog: true,
-                          ),
-                        );
+                        final bool? isDeleted = await context.push(
+                          '/full_image_screen',
+                          extra: {'imagePath': images[imageIndex], 'index': imageIndex},
+                        ) as bool?;
+                        
                         if (isDeleted == true) {
                           setState(() {
                             images.removeAt(imageIndex);
