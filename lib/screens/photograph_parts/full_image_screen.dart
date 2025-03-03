@@ -34,6 +34,8 @@ class FullImageScreen extends StatelessWidget {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).primaryColor,
+                      foregroundColor: Colors.white,
+                      side: BorderSide(color: Colors.white, width: 1),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -46,7 +48,7 @@ class FullImageScreen extends StatelessWidget {
                     child: Text(
                       'Go Back',
                       style: GoogleFonts.inter(
-                        textStyle: TextStyle(fontSize: 16, color: Colors.white),
+                        textStyle: TextStyle(fontSize: 14, color: Colors.white),
                       ),
                     ),
                   ),
@@ -57,7 +59,7 @@ class FullImageScreen extends StatelessWidget {
                     _showDeleteConfirmationDialog(context);
                   },
                   label: const Text("Delete Image"),
-                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.redCardColor),
+                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.redCardColor,foregroundColor: Colors.white, side: BorderSide(color: Colors.white, width: 1)),
                 ),
               ],
             ),
@@ -72,7 +74,7 @@ class FullImageScreen extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Delete Photo", style: TextStyle(color: Colors.black)),
+          title: const Text("Delete Photo", style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
           content: const Text("Are you sure you want to delete this photo?", style: TextStyle(color: Colors.black)),
           actions: [
             // Cancel Button (styled)
@@ -81,9 +83,10 @@ class FullImageScreen extends StatelessWidget {
                 Navigator.pop(context); // Cancel action
               },
               style: TextButton.styleFrom(
-                foregroundColor: Colors.grey, // Text color
-                backgroundColor: Colors.transparent, // Background color (transparent)
+                foregroundColor: Colors.black, // Text color
+                backgroundColor: Colors.white, // Background color (transparent)
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                side: BorderSide(color: Colors.black, width: 1), // Adding a black border
               ),
               child: const Text("Cancel", style: TextStyle(fontSize: 16)),
             ),
@@ -95,7 +98,7 @@ class FullImageScreen extends StatelessWidget {
               },
               style: TextButton.styleFrom(
                 foregroundColor: Colors.white, // Text color
-                backgroundColor: Colors.red, // Red background for delete
+                backgroundColor: AppTheme.redCardColor, // Red background for delete
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30), // Rounded corners
