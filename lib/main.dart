@@ -19,11 +19,6 @@ void main() async {
   runApp(MainApp(isFirstLaunch: isFirstLaunch));
 }
 
-
-
-
-
-
 class MainApp extends StatelessWidget {
   final bool isFirstLaunch;
 

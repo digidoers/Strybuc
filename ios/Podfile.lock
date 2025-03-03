@@ -43,14 +43,14 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/webview_flutter_wkwebview/darwin"
 
 SPEC CHECKSUMS:
-  arkit_plugin: c08c4e6f334a922154c2caf2f6fadfaefb51c181
+  arkit_plugin: 2c387e26e137de4bd1fc16ec2fabd05c84c5a817
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   GLTFSceneKit: d1b437c514ba2aed5555afb0fddd64e030612d57
-  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
-  shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
-  url_launcher_ios: 5334b05cef931de560670eeae103fd3e431ac3fe
-  webview_flutter_wkwebview: 0982481e3d9c78fd5c6f62a002fcd24fc791f1e4
+  path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
+  shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
+  url_launcher_ios: 694010445543906933d732453a59da0a173ae33d
+  webview_flutter_wkwebview: 1821ceac936eba6f7984d89a9f3bcb4dea99ebb2
 
 PODFILE CHECKSUM: aa7478eb1b7e889af4b325531b624821999b822d
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2

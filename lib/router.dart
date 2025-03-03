@@ -24,7 +24,7 @@ import 'package:strybuc/screens/thank_you.dart';
 
 GoRouter createRouter(bool isFirstLaunch) {
   return GoRouter(
-      initialLocation: isFirstLaunch ? '/thank_you' : '/login',
+      initialLocation: isFirstLaunch ? '/thank_you' : '/',
       routes: [
         GoRoute(
           path: '/splash',

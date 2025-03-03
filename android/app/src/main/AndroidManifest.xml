@@ -33,7 +33,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".Measurement" android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+        <!-- <activity android:name=".Measurement" android:theme="@style/Theme.AppCompat.Light.NoActionBar"/> -->
         <!-- AR Activity -->
         <activity
             android:name=".ARMeasurementActivity"

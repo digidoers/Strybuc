@@ -23,7 +23,6 @@ dependencies:
   flutter_launcher_icons: ^0.14.2
   shared_preferences: ^2.3.5
 #  arcore_flutter_plugin: ^0.1.0
-  ar_flutter_plugin: ^0.7.0
   # Network and API
   http: ^1.1.0  # Added for API calls
 # connectivity_plus: ^5.0.1  # Added for network connectivity checks

@@ -24,7 +24,7 @@ class _DistanceTrackingScreenState extends State<DistanceTrackingScreen> {
   ARKitNode? lineNode;
   vector.Vector3? lastPosition;
   String headingTitle = 'Hover over your product';
-  Uint8List? _capturedImage;
+  final List<Uint8List> _capturedImage = [];
   List<String> addedNodes = [];
   vector.Vector3? startPosition;
   vector.Vector3? endPosition;
@@ -72,8 +72,8 @@ class _DistanceTrackingScreenState extends State<DistanceTrackingScreen> {
                       //   child:
                       GestureDetector(
                         onTap: () {
-                          if (_capturedImage != null) {
-                            _showFullScreenImage(context, _capturedImage!);
+                          if (_capturedImage.isNotEmpty) {
+                            _showFullScreenImage(context, _capturedImage.last);
                           }
                         },
                         child: Container(
@@ -83,18 +83,18 @@ class _DistanceTrackingScreenState extends State<DistanceTrackingScreen> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(10),
-                            image: _capturedImage != null
+                            image: _capturedImage.isNotEmpty
                                 ? DecorationImage(
-                                    image: MemoryImage(_capturedImage!),
+                                    image: MemoryImage(_capturedImage.last),
                                     fit: BoxFit.cover,
                                   )
                                 : null,
                           ),
-                          child: _capturedImage != null
+                          child: _capturedImage.isNotEmpty
                               ? ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: Image.memory(
-                                    _capturedImage!,
+                                    _capturedImage.last,
                                     fit: BoxFit.cover,
                                   ),
                                 )
@@ -202,20 +202,19 @@ class _DistanceTrackingScreenState extends State<DistanceTrackingScreen> {
     if (startPosition == null) {
       // First point
       startPosition = position;
-        _addPoint(position);
+      _addPoint(position);
     } else if (endPosition == null) {
       // Second point
-        endPosition = position;
-        _addPoint(position);
+      endPosition = position;
+      _addPoint(position);
       _drawLine(position);
     } else {
       // Ignore extra taps
       return;
     }
-
   }
 
-   void _addPoint(vector.Vector3 position) {
+  void _addPoint(vector.Vector3 position) {
     final material = ARKitMaterial(
       lightingModelName: ARKitLightingModel.constant,
       diffuse: ARKitMaterialProperty.color(Colors.red),
@@ -228,36 +227,38 @@ class _DistanceTrackingScreenState extends State<DistanceTrackingScreen> {
     final sphereNode = ARKitNode(geometry: startSphere, position: position);
 
     arKitController.add(sphereNode);
-    
+
     addedNodes.add(sphereNode.name);
 
     // return sphereNode;
   }
 
   void _drawLine(vector.Vector3 position) {
+    print('drawing the line');
+    final line = ARKitLine(fromVector: startPosition!, toVector: endPosition!);
+
+    final lineNode = ARKitNode(geometry: line);
+
+    addedNodes.add(lineNode.name);
+
+    // Add the node
+    arKitController.add(lineNode);
+
+    final totalDistance =
+        _calculateDistanceBetweenPoints(startPosition!, endPosition!);
+
+    setState(() {
+      headingTitle =
+          'distance measured = $totalDistance'; // Update totalDistance;
+    });
     // if (lastPosition != null) {
-      final line = ARKitLine(fromVector: startPosition!, toVector: endPosition!);
+      final point = _getMiddlePoint(endPosition!, startPosition!);
 
-      final lineNode = ARKitNode(geometry: line);
-
-      addedNodes.add(lineNode.name);
-
-      // Add the node
-      arKitController.add(lineNode);
-
-      final totalDistance =
-          _calculateDistanceBetweenPoints(startPosition!, endPosition!);
-
-      setState(() {
-        headingTitle =
-            'distance measured = $totalDistance'; // Update totalDistance;
-      });
-
-      // final point = _getMiddlePoint(position, lastPosition!);
-
-      // _drawText(totalDistance, point);
+      _drawText(totalDistance, point);
+    // }else{
+    //   lastPosition = position;
+    //   print('lastPosition $lastPosition');
     // }
-    // lastPosition = position;
   }
 
   String _calculateDistanceBetweenPoints(
@@ -268,46 +269,47 @@ class _DistanceTrackingScreenState extends State<DistanceTrackingScreen> {
     return '${(distanceInches).toStringAsFixed(2)} inches';
   }
 
-  // vector.Vector3 _getMiddlePoint(
-  //     vector.Vector3 position, vector.Vector3 lastPosition) {
-  //   final x = (position.x + lastPosition.x) / 2;
-  //   final y = (position.y + lastPosition.y) / 2;
-  //   final z = (position.z + lastPosition.z) / 2;
+  vector.Vector3 _getMiddlePoint(
+      vector.Vector3 position, vector.Vector3 lastPosition) {
+    final x = (position.x + lastPosition.x) / 2;
+    final y = (position.y + lastPosition.y) / 2;
+    final z = (position.z + lastPosition.z) / 2;
 
-  //   return vector.Vector3(x, y, z);
-  // }
+    return vector.Vector3(x, y, z);
+  }
 
-  // void _drawText(String text, vector.Vector3 point) {
-  //   final textGeometry = ARKitText(text: text, extrusionDepth: 1, materials: [
-  //     ARKitMaterial(
-  //       diffuse: ARKitMaterialProperty.color(Colors.red),
-  //     )
-  //   ]);
+  void _drawText(String text, vector.Vector3 point) {
+    final textGeometry = ARKitText(text: text, extrusionDepth: 1, materials: [
+      ARKitMaterial(
+        diffuse: ARKitMaterialProperty.color(Colors.red),
+      )
+    ]);
 
-  //   final scale = 0.001;
-  //   final vectorScale = vector.Vector3(scale, scale, scale);
+    final scale = 0.001;
+    final vectorScale = vector.Vector3(scale, scale, scale);
 
-  //   final textNode = ARKitNode(
-  //     geometry: textGeometry,
-  //     position: point,
-  //     scale: vectorScale,
-  //     // rotation: vector.Vector4(1, 0, 0, -math.pi / 2),
-  //   );
+    final textNode = ARKitNode(
+      geometry: textGeometry,
+      position: point,
+      scale: vectorScale,
+      rotation: vector.Vector4(1, 0, 0, -math.pi / 2),
+    );
+    addedNodes.add(textNode.name);
 
-  //   arKitController
-  //       .getNodeBoundingBox(textNode)
-  //       .then((List<vector.Vector3> result) {
-  //     final minVector = result[0];
-  //     final maxVector = result[1];
-  //     final dx = (maxVector.x - minVector.x) / 2 * scale;
-  //     final dy = (maxVector.y - minVector.y) / 2 * scale;
-  //     final position = vector.Vector3(textNode.position.x - dx,
-  //         textNode.position.y - dy + 0.01, textNode.position.z);
-  //     textNode.position = position;
-  //   });
+    arKitController
+        .getNodeBoundingBox(textNode)
+        .then((List<vector.Vector3> result) {
+      final minVector = result[0];
+      final maxVector = result[1];
+      final dx = (maxVector.x - minVector.x) / 2 * scale;
+      final dy = (maxVector.y - minVector.y) / 2 * scale;
+      final position = vector.Vector3(textNode.position.x - dx,
+          textNode.position.y - dy + 0.01, textNode.position.z);
+      textNode.position = position;
+    });
 
-  //   arKitController.add(textNode);
-  // }
+    arKitController.add(textNode);
+  }
 
   void _captureARView() async {
     try {
@@ -315,7 +317,7 @@ class _DistanceTrackingScreenState extends State<DistanceTrackingScreen> {
           await arKitController.snapshot(); // Returns MemoryImage
       if (imageProvider is MemoryImage) {
         setState(() {
-          _capturedImage = imageProvider.bytes as Uint8List?;
+          _capturedImage.add(imageProvider.bytes);
           headingTitle = '';
         });
 
@@ -334,7 +336,7 @@ class _DistanceTrackingScreenState extends State<DistanceTrackingScreen> {
   }
 
   void _resetARView() {
-    for(var node in addedNodes){
+    for (var node in addedNodes) {
       arKitController.remove(node);
     }
     arKitController.removeAnchor(anchorId); // Remove all anchors
@@ -345,14 +347,14 @@ class _DistanceTrackingScreenState extends State<DistanceTrackingScreen> {
     headingTitle = 'Hover over your product';
 
     // arKitController. = ARPlaneDetection.horizontal;
-  //   arKitController.dispose(); // Dispose the current session
+    //   arKitController.dispose(); // Dispose the current session
 
-  // // Delay to allow proper disposal
-  // Future.delayed(Duration(milliseconds: 500), () {
-  //   setState(() {
-  //     arKitController = ARKitController();
-  //   });
-  // });
+    // // Delay to allow proper disposal
+    // Future.delayed(Duration(milliseconds: 500), () {
+    //   setState(() {
+    //     arKitController = ARKitController();
+    //   });
+    // });
   }
 
   void _showFullScreenImage(BuildContext context, Uint8List imageBytes) {
