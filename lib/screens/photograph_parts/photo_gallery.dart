@@ -1,5 +1,9 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:strybuc/screens/photograph_parts/full_image_screen.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:strybuc/theme.dart'; // Assuming AppTheme is defined here
 import 'package:strybuc/screens/photograph_parts/send_request.dart';
 
@@ -11,14 +15,25 @@ class PhotoGalleryRepScreen extends StatefulWidget {
 }
 
 class _PhotoGalleryRepScreenState extends State<PhotoGalleryRepScreen> {
-  List<String> images = [
-    'assets/images/full_first.png',
-    'assets/images/full_first.png',
-    'assets/images/full_first.png',
-    'assets/images/full_first.png',
-    'assets/images/full_first.png',
-    'assets/images/full_first.png',
-  ];
+  List<String> images = [];
+  
+  @override
+    void initState() {
+    super.initState();
+    _loadImagesFromPrefs(); // Load images from SharedPreferences when the screen opens
+  }
+
+    /// Load images from SharedPreferences
+  Future<void> _loadImagesFromPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? storedImages = prefs.getStringList('captured_images');
+
+    if (storedImages != null) {
+      setState(() {
+        images = storedImages; // Set the loaded images
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +56,7 @@ class _PhotoGalleryRepScreenState extends State<PhotoGalleryRepScreen> {
                     // Camera Box when images are less than 6
                     return GestureDetector(
                       onTap: () {
-                        // Add camera functionality here
+                        context.pop('/photograph_parts/distance_tracking');
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -63,16 +78,11 @@ class _PhotoGalleryRepScreenState extends State<PhotoGalleryRepScreen> {
                     int imageIndex = images.length < 6 ? index - 1 : index;
                     return GestureDetector(
                       onTap: () async {
-                        final bool? isDeleted = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => FullImageScreen(
-                              imagePath: images[imageIndex],
-                              index: imageIndex,
-                            ),
-                            fullscreenDialog: true,
-                          ),
-                        );
+                        final bool? isDeleted = await context.push(
+                          '/full_image_screen',
+                          extra: {'imagePath': base64Decode(images[imageIndex]), 'index': imageIndex},
+                        ) as bool?;
+                        
                         if (isDeleted == true) {
                           setState(() {
                             images.removeAt(imageIndex);
@@ -81,8 +91,8 @@ class _PhotoGalleryRepScreenState extends State<PhotoGalleryRepScreen> {
                       },
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10),
-                        child: Image.asset(
-                          images[imageIndex],
+                        child: Image.memory(
+                          base64Decode(images[imageIndex]),
                           fit: BoxFit.cover,
                         ),
                       ),

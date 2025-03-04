@@ -1,9 +1,13 @@
+import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:typed_data';
 import 'package:arkit_plugin/arkit_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:strybuc/theme.dart';
+import 'package:strybuc/widgets/confirmation_dialog.dart';
 import 'package:strybuc/widgets/photograph_parts_header.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 
@@ -40,84 +44,97 @@ class _DistanceTrackingScreenState extends State<DistanceTrackingScreen> {
         appBar: AppBar(
           title: const Text('Photograph Part'),
         ),
-        body: Column(
+        body: Stack(
           children: [
-            if (headingTitle != '') PhotographPartsHeader(title: headingTitle),
-            Expanded(
-              child: ARKitSceneView(
-                planeDetection: ARPlaneDetection.horizontalAndVertical,
-                onARKitViewCreated: onARKitViewCreated,
-                enableTapRecognizer: true,
-                enableRotationRecognizer: true,
-              ),
-            ),
             Column(
-              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Container(
-                  height: 92,
-                  color: Colors.black,
-                  // decoration: BoxDecoration(
-                  //   color: Colors.black,
-                  //   border: Border(
-                  //     top: BorderSide(color: Colors.grey.shade700, width: 2),
-                  //   ),
-                  // ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Image Preview Box
-                      // GestureDetector(
-                      //   onTap: _pickImage,
-                      //   child:
-                      GestureDetector(
-                        onTap: () {
-                          if (_capturedImage.isNotEmpty) {
-                            _showFullScreenImage(context, _capturedImage.last);
-                          }
-                        },
-                        child: Container(
-                          width: 50,
-                          height: 50,
-                          margin: const EdgeInsets.only(left: 16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            image: _capturedImage.isNotEmpty
-                                ? DecorationImage(
-                                    image: MemoryImage(_capturedImage.last),
-                                    fit: BoxFit.cover,
-                                  )
-                                : null,
-                          ),
-                          child: _capturedImage.isNotEmpty
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: Image.memory(
-                                    _capturedImage.last,
-                                    fit: BoxFit.cover,
-                                  ),
+                if (headingTitle != '')
+                  PhotographPartsHeader(title: headingTitle),
+                Expanded(
+                  child: ARKitSceneView(
+                    planeDetection: ARPlaneDetection.horizontalAndVertical,
+                    onARKitViewCreated: onARKitViewCreated,
+                    enableTapRecognizer: true,
+                    enableRotationRecognizer: true,
+                  ),
+                ),
+              ],
+            ),
+
+            // Send (x) Images Button
+            if (_capturedImage.isNotEmpty)
+              Positioned(
+                bottom: 100, // Adjust position above the camera controls
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: ElevatedButton(
+                    onPressed: () => context.push('/photograph_parts/gallery'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 28, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        side: BorderSide(color: Colors.white),
+                      ),
+                    ),
+                    child: Text(
+                      'Send (${_capturedImage.length}) Images',
+                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                  ),
+                ),
+              ),
+
+            // Bottom Camera Controls
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                height: 92,
+                color: Colors.black,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Image Preview
+                    GestureDetector(
+                      onTap: () {
+                        if (_capturedImage.isNotEmpty) {
+                          context.push('/photograph_parts/gallery');
+                        }
+                      },
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        margin: const EdgeInsets.only(left: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          image: _capturedImage.isNotEmpty
+                              ? DecorationImage(
+                                  image: MemoryImage(_capturedImage.last),
+                                  fit: BoxFit.cover,
                                 )
                               : null,
                         ),
                       ),
+                    ),
 
-                      // Camera Button
-                      InkWell(
-                        onTap: _captureARView,
-                        borderRadius: BorderRadius.circular(50),
-                        child: SvgPicture.asset(
-                          'assets/images/sutter.svg',
-                        ),
+                    // Camera Button
+                    InkWell(
+                      onTap: _captureARView,
+                      borderRadius: BorderRadius.circular(50),
+                      child: SvgPicture.asset(
+                        'assets/images/sutter.svg',
                       ),
-                      Container(
-                        width: 50,
-                        height: 50,
-                      )
-                    ],
-                  ),
+                    ),
+                    SizedBox(
+                      height: 50,
+                      width: 50,
+                    )
+                  ],
                 ),
-              ],
+              ),
             ),
           ],
         ),
@@ -252,9 +269,9 @@ class _DistanceTrackingScreenState extends State<DistanceTrackingScreen> {
           'distance measured = $totalDistance'; // Update totalDistance;
     });
     // if (lastPosition != null) {
-      final point = _getMiddlePoint(endPosition!, startPosition!);
+    final point = _getMiddlePoint(endPosition!, startPosition!);
 
-      _drawText(totalDistance, point);
+    _drawText(totalDistance, point);
     // }else{
     //   lastPosition = position;
     //   print('lastPosition $lastPosition');
@@ -315,11 +332,17 @@ class _DistanceTrackingScreenState extends State<DistanceTrackingScreen> {
     try {
       final ImageProvider imageProvider =
           await arKitController.snapshot(); // Returns MemoryImage
+      var capturedImage = await arKitController.getCapturedImage();
       if (imageProvider is MemoryImage) {
         setState(() {
           _capturedImage.add(imageProvider.bytes);
           headingTitle = '';
         });
+        await _saveCapturedImage();
+        if (_capturedImage.length == 6) {
+          _showLimitReachedDialog(context);
+        }
+        print('captured images length ${_capturedImage.length}');
 
         // Show SnackBar
         ScaffoldMessenger.of(context).showSnackBar(
@@ -333,6 +356,46 @@ class _DistanceTrackingScreenState extends State<DistanceTrackingScreen> {
     } catch (e) {
       print("Error capturing AR view: $e");
     }
+  }
+
+  void _showLimitReachedDialog(BuildContext context) {
+    var primaryColor = Theme.of(context).primaryColor;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ConfirmationDialog(
+          title: 'Maximum photo reached',
+          message: 'You have reached the limit of ${_capturedImage.length} photos.',
+          backgroundColor: Colors.white,
+          firstButtonTitle: 'Edit Photos',
+          firstButtonColor: Colors.white,
+          firstButtonTextColor: primaryColor,
+          firstButtonOnPressed: () => {
+            Navigator.pop(context),
+            context.push('/photograph_parts/gallery')
+          },
+          secondButtonTitle: 'Send ${_capturedImage.length} Photos',
+          secondButtonColor: primaryColor,
+          secondButtonTextColor: Colors.white,
+          secondButtonOnPressed: () => {
+            Navigator.pop(context),
+            context.push('/photograph_parts/gallery')
+          },
+        );
+      },
+    ).then((shouldDelete) {
+      if (shouldDelete == true) {
+        // Perform the deletion logic here (e.g., remove image from gallery)
+        Navigator.pop(context, true); // Go back to the gallery page
+      }
+    });
+  }
+
+  Future<void> _saveCapturedImage() async {
+    final prefs = await SharedPreferences.getInstance();
+    // store captured images in shared preferences
+    await prefs.setStringList('captured_images',
+        _capturedImage.map((image) => base64Encode(image)).toList());
   }
 
   void _resetARView() {

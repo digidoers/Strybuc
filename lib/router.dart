@@ -16,6 +16,7 @@ import 'package:strybuc/screens/photograph_parts/android/distance_tracking.dart'
 import 'package:strybuc/screens/photograph_parts/ios/ios_distance_tracking.dart';
 import 'package:strybuc/screens/photograph_parts/instructions.dart';
 import 'package:strybuc/screens/photograph_parts/send_request.dart';
+import 'package:strybuc/screens/photograph_parts/full_image_screen.dart';
 import 'package:strybuc/screens/profile.dart';
 import 'package:strybuc/screens/shop.dart';
 import 'package:strybuc/screens/sign_up.dart';
@@ -33,8 +34,6 @@ GoRouter createRouter(bool isFirstLaunch) {
         GoRoute(
           path: '/login',
           builder: (context, state) => const LoginScreen(),
-          //builder: (context, state) => const PhotoGalleryRepScreen(),
-          //builder: (context, state) => const SendRequestScreen(),
         ),
         GoRoute(
           path: '/guest_login',
@@ -54,6 +53,16 @@ GoRouter createRouter(bool isFirstLaunch) {
             return const ThankYouScreen(key: Key('thank_you'));
           },
         ),
+        GoRoute(
+        path: '/full_image_screen',
+        builder: (context, state) {
+          final Map<String, dynamic> extra = state.extra as Map<String, dynamic>? ?? {};
+          return FullImageScreen(
+            key: const Key('full_image_screen'),
+            imagePath: extra['imagePath'] ?? '',
+            index: extra['index'] ?? 0,
+          );
+        }),
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) {
             return LayoutScreen(
@@ -68,7 +77,6 @@ GoRouter createRouter(bool isFirstLaunch) {
                   path: '/',
                   builder: (BuildContext context, GoRouterState state) {
                     return const HomeScreen();
-                    //return const PhotoGalleryRepScreen();
                   },
                 ),
               ],
@@ -176,6 +184,7 @@ GoRouter createRouter(bool isFirstLaunch) {
                     return const InstructionsScreen(
                       key: Key('photograph_parts_instructions'),
                     );
+                    // return const PhotoGalleryRepScreen();
                   },
                 ),
                 GoRoute(
@@ -185,6 +194,16 @@ GoRouter createRouter(bool isFirstLaunch) {
                     return const SendRequestScreen(
                       key: Key('photograph_parts_send_request'), images: [],
                     );
+                  },
+                ),
+                GoRoute(
+                  name: 'photograph_parts_gallery',
+                  path: '/photograph_parts/gallery',
+                  builder: (BuildContext context, GoRouterState state) {
+                    return const PhotoGalleryRepScreen(
+                      key: Key('photograph_parts_gallery'),
+                    );
+                    // return const PhotoGalleryRepScreen();
                   },
                 ),
               ],

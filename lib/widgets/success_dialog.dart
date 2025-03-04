@@ -64,7 +64,7 @@ class _SuccessDialogState extends State<SuccessDialog> with TickerProviderStateM
                     onLoaded: (composition) {
                       _controller
                       ..duration = composition.duration
-                      ..forward();
+                      ..repeat();
                     }
                   ),
                   const SizedBox(height: 24),

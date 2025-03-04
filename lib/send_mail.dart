@@ -14,10 +14,13 @@ Future<void> sendEmailSMTP({
   final prefs = await SharedPreferences.getInstance();
   final String customerId = prefs.getString('login') ?? 'Guest User'; // Ensure correct key is used
   final smtpServer = gmail(salesEmail, appPassword); // Use an App Password
+  final String customerEmail = prefs.getString('salesman_email_address') ?? '';
+  final String guestEmail = 'ageorge@strybuc.com';
+  final String recipientsMail = prefs.getString('login')?.isNotEmpty == true ? customerEmail : guestEmail;
 
   final message = Message()
     ..from = Address(salesEmail, 'Strybuc')
-    ..recipients.add('digitester@yopmail.com')
+    ..recipients.add(recipientsMail)
     ..subject = 'Strybuc App - Customer ID # $customerId'
     ..text = '''
     Hello Team,  
