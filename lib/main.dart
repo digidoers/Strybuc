@@ -15,16 +15,29 @@ void main() async {
   // Check if first launch
   final prefs = await SharedPreferences.getInstance();
   final bool isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
+   final bool isLoggedIn = prefs.getString('customer_email_address') != null;
 
-  runApp(MainApp(isFirstLaunch: isFirstLaunch));
+   // Set `is_first_launch` to false after first launch
+  if (isFirstLaunch) {
+    prefs.setBool('is_first_launch', false);
+  }
+
+  runApp(MainApp(isFirstLaunch: isFirstLaunch, isLoggedIn: isLoggedIn));
 }
+
+
+
+
+
 
 class MainApp extends StatelessWidget {
   final bool isFirstLaunch;
+  final bool isLoggedIn;
 
   const MainApp({
     super.key,
     required this.isFirstLaunch,
+    required this.isLoggedIn
   });
 
   @override
@@ -33,7 +46,7 @@ class MainApp extends StatelessWidget {
       title: 'Strybuc',
       theme: AppTheme.lightTheme,
       debugShowCheckedModeBanner: false,
-      routerConfig: createRouter(isFirstLaunch),
+      routerConfig: createRouter(isFirstLaunch,isLoggedIn),
     );
   }
 }

@@ -23,9 +23,11 @@ import 'package:strybuc/screens/sign_up.dart';
 import 'package:strybuc/screens/splash_screen.dart';
 import 'package:strybuc/screens/thank_you.dart';
 
-GoRouter createRouter(bool isFirstLaunch) {
+GoRouter createRouter(bool isFirstLaunch, bool isLoggedIn) {
   return GoRouter(
-      initialLocation: isFirstLaunch ? '/thank_you' : '/',
+      initialLocation: isFirstLaunch
+        ? '/thank_you' // Show Thank You screen on first launch
+        : (isLoggedIn ? '/' : '/login'), // Redirect to home if logged in, otherwise login
       routes: [
         GoRoute(
           path: '/splash',
