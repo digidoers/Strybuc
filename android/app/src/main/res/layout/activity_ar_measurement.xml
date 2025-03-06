@@ -1,26 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent"
-  android:orientation="vertical">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
   <fragment
-    android:id="@+id/sceneform_fragment"
-    android:name="com.demo.demo_flutter_ar.CustomArFragment"
-    android:layout_width="match_parent"
-    android:layout_height="0dp"
-    android:layout_weight="1" />
+      android:id="@+id/sceneform_fragment"
+      android:name="com.example.strybuc.CustomArFragment"
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:layout_weight="1" />
+
+  <Button
+      android:id="@+id/capture_btn"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:background="#2196F3"
+      android:text="Capture"
+      android:textColor="#FFFFFF"
+      tools:visibility="visible" />
 
   <TextView
-    android:id="@+id/btn_start"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="bottom"
-    android:layout_marginTop="8dp"
-    android:gravity="center"
-    android:padding="16dp"
-    android:text="Clear"
-    android:textColor="#000000"
-    android:textSize="20sp" />
+      android:id="@+id/btn_start"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_gravity="bottom"
+      android:layout_marginTop="8dp"
+      android:gravity="center"
+      android:padding="6dp"
+      android:text="Clear"
+      android:textColor="#000000"
+      android:textSize="20sp" />
 
 </LinearLayout>

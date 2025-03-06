@@ -26,13 +26,16 @@ Future<List<Attachment>> getAttachments(images) async {
 
   // attachments.add(FileAttachment(tempFile));
   for (var image in images) {
-    final tempDir = await getTemporaryDirectory();
-    final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-    final File tempFile = File('${tempDir.path}/image_$timestamp.jpg');
-    Uint8List imageBytes = base64Decode(image);
-    await tempFile.writeAsBytes(imageBytes);
-    attachments.add(FileAttachment(tempFile));
+    print('attachments image $image');
+    // final tempDir = await getTemporaryDirectory();
+    // final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+    // final File tempFile = File('${tempDir.path}/image_$timestamp.jpg');
+    // Uint8List imageBytes = image;
+    // await tempFile.writeAsBytes(imageBytes);
+    File file = File(image);
+    attachments.add(FileAttachment(file));
   }
+    print('attachments $attachments');
 
   return attachments;
 }
@@ -42,6 +45,7 @@ Future<void> sendEmailSMTP({
   required String messageData,
   required List<String> images, // Accept image paths
 }) async {
+  print('images send mail $images');
   final String salesEmail = AppConfig.salesEmail;
   final String appPassword = AppConfig.appPassword;
   final prefs = await SharedPreferences.getInstance();

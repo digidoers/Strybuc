@@ -54,6 +54,15 @@ GoRouter createRouter(bool isFirstLaunch) {
           },
         ),
         GoRoute(
+                  name: 'photograph_parts_send_request',
+                  path: '/photograph_parts/send_request',
+                  builder: (BuildContext context, GoRouterState state) {
+                    return const SendRequestScreen(
+                      key: Key('photograph_parts_send_request'), images: [],
+                    );
+                  },
+                ),
+        GoRoute(
         path: '/full_image_screen',
         builder: (context, state) {
           final Map<String, dynamic> extra = state.extra as Map<String, dynamic>? ?? {};
@@ -187,15 +196,15 @@ GoRouter createRouter(bool isFirstLaunch) {
                     // return const PhotoGalleryRepScreen();
                   },
                 ),
-                GoRoute(
-                  name: 'photograph_parts_send_request',
-                  path: '/photograph_parts/send_request',
-                  builder: (BuildContext context, GoRouterState state) {
-                    return const SendRequestScreen(
-                      key: Key('photograph_parts_send_request'), images: [],
-                    );
-                  },
-                ),
+                // GoRoute(
+                //   name: 'photograph_parts_send_request',
+                //   path: '/photograph_parts/send_request',
+                //   builder: (BuildContext context, GoRouterState state) {
+                //     return const SendRequestScreen(
+                //       key: Key('photograph_parts_send_request'), images: [],
+                //     );
+                //   },
+                // ),
                 GoRoute(
                   name: 'photograph_parts_gallery',
                   path: '/photograph_parts/gallery',

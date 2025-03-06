@@ -92,7 +92,7 @@ class _SuccessDialogState extends State<SuccessDialog> with TickerProviderStateM
 
                   // Go Back Home button
                   ElevatedButton(
-                    onPressed: () => context.pop(),
+                    onPressed: () => context.push('/'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF1a337e),
                       padding: const EdgeInsets.symmetric(

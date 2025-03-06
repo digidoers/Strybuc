@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -22,7 +23,7 @@ class SendRequestScreen extends StatefulWidget {
 class _SendRequestScreenState extends State<SendRequestScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController messageController = TextEditingController();
-  bool _isLoading = false;
+  bool _isLoading = true;
 
   List<String> images = [];
   @override
@@ -122,8 +123,8 @@ class _SendRequestScreenState extends State<SendRequestScreen> {
                             padding: const EdgeInsets.only(right: 8.0),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(10),
-                              child: Image.memory(
-                                base64Decode(image),
+                              child: Image.file(
+                                File(image),
                                 width: 80, // Adjust size as needed
                                 height: 80,
                                 fit: BoxFit.cover,
@@ -137,48 +138,59 @@ class _SendRequestScreenState extends State<SendRequestScreen> {
                   const SizedBox(height: 30),
                   Center(
                     child: ElevatedButton.icon(
-                      onPressed: _isLoading ? null : () async {
-                        String name = nameController.text;
-                        String messageData = messageController.text;
+                      onPressed: _isLoading
+                          ? null
+                          : () async {
+                              String name = nameController.text;
+                              String messageData = messageController.text;
 
-                        if (name.isEmpty || messageData.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                                content: Text("Please fill in all fields")),
-                          );
-                          return;
-                        }
+                              if (name.isEmpty || messageData.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content:
+                                          Text("Please fill in all fields")),
+                                );
+                                return;
+                              }
 
-                        setState(() {
-                          _isLoading = true;
-                        });
+                              setState(() {
+                                _isLoading = true;
+                              });
 
-                        await sendEmailSMTP(
-                          name: name,
-                          messageData: messageData,
-                          images: images, // Pass images dynamically
-                        );
+                              await sendEmailSMTP(
+                                name: name,
+                                messageData: messageData,
+                                images: widget.images, // Pass images dynamically
+                              );
 
-                        setState(() {
-                          _isLoading = false;
-                        });
-                        showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (BuildContext context) =>
-                              const SuccessDialog(
-                            title: 'Thank you for your photo(s)!',
-                            message:
-                                'We are processing your request and will contact you as soon as we identify the part(s) you need. Your Sales Rep will get back to you shortly.',
-                          ),
-                        );
-                      },
+                              final prefs =
+                                  await SharedPreferences.getInstance();
+                              await prefs.remove('captured_images');
+
+                              setState(() {
+                                _isLoading = false;
+                                messageController.clear();
+                              });
+
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (BuildContext context) =>
+                                    const SuccessDialog(
+                                  title: 'Thank you for your photo(s)!',
+                                  message:
+                                      'We are processing your request and will contact you as soon as we identify the part(s) you need. Your Sales Rep will get back to you shortly.',
+                                ),
+                              );
+                            },
                       label: Text(
                         'Send to Your Sales Rep',
                         style: AppTheme.buttonTextStyle,
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _isLoading ? Colors.grey : Theme.of(context).primaryColor,
+                        backgroundColor: _isLoading
+                            ? Colors.grey
+                            : Theme.of(context).primaryColor,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
                           vertical: 12,

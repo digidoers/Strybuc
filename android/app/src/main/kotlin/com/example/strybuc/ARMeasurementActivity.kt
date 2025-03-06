@@ -1,5 +1,7 @@
 package com.example.strybuc
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -20,6 +22,20 @@ import com.google.ar.sceneform.rendering.ShapeFactory
 import com.google.ar.sceneform.rendering.ViewRenderable
 import java.text.DecimalFormat
 import kotlin.math.sqrt
+import com.google.ar.core.Config
+import io.flutter.plugin.common.MethodChannel
+import android.view.View
+import android.graphics.Bitmap
+import android.os.Environment
+import android.os.Handler
+import android.os.Looper
+import android.view.PixelCopy
+import android.view.SurfaceView
+import java.util.*
+import java.io.File
+import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import android.widget.Toast
 
 data class AnchorInfoBean(
   var dataText: String,
@@ -32,6 +48,9 @@ class ARMeasurementActivity : AppCompatActivity() {
   val df = DecimalFormat("#.##")
 
   private val btnClear by lazy { findViewById<TextView>(R.id.btn_start) }
+
+  private val captureButton by lazy { findViewById<TextView>(R.id.capture_btn) }
+
   private var arFragment: CustomArFragment? = null
 
   private val dataArray = arrayListOf<AnchorInfoBean>()
@@ -39,6 +58,8 @@ class ARMeasurementActivity : AppCompatActivity() {
   private var startNode: AnchorNode? = null
   private var endNode: AnchorNode? = null
   private var lineNode: Node? = null
+  private val screenshotPaths = mutableListOf<String>()
+  private var screenshotCount: Int = 0
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -47,8 +68,94 @@ class ARMeasurementActivity : AppCompatActivity() {
     arFragment?.setOnTapArPlaneListener { hitResult, plane, motionEvent ->
       tapPlane(hitResult, plane, motionEvent)
     }
+    val resultIntent = Intent()
+    screenshotCount = resultIntent.getIntExtra("screenshotCount", 0)
+    Log.d("ARMeasurementActivity", "Screenshot Limit: $screenshotCount")
+
     btnClear.setOnClickListener {
       clearAllNodes()
+    }
+
+    captureButton.setOnClickListener {
+      captureScreenshot()
+      Log.d("ARMeasurementActivity", "captureButton.setOnClickListener")
+    }
+  }
+
+  private fun captureScreenshot() {
+    // Get the AR SceneView from the fragment
+    val arSceneView = arFragment?.arSceneView ?: run {
+      Log.e("ARMeasurementActivity", "AR SceneView is null")
+      return
+    }
+
+    // Create a Bitmap with the same dimensions as the AR SceneView
+    val bitmap = Bitmap.createBitmap(arSceneView.width, arSceneView.height, Bitmap.Config.ARGB_8888)
+
+    // Use a Handler on the main looper for PixelCopy
+    val handler = Handler(Looper.getMainLooper())
+
+    PixelCopy.request(arSceneView, bitmap, { copyResult ->
+      if (copyResult == PixelCopy.SUCCESS) {
+        // Save the bitmap and add the path to our list
+        val savedPath = saveScreenshot(bitmap)
+        if (savedPath != null) {
+          screenshotPaths.add(savedPath)
+          Log.d("ARMeasurementActivity", "Screenshot saved: ${screenshotPaths.size}")
+          runOnUiThread {
+            Toast.makeText(this, "Screenshot captured!", Toast.LENGTH_SHORT).show()
+          }
+          // increment screenshot limit
+//          if(screenshotCount == 6) {
+            sendResultAndClose()
+//          }
+        }
+      } else {
+        Log.e("ARMeasurementActivity", "PixelCopy failed with result: $copyResult")
+        runOnUiThread {
+          Toast.makeText(this, "Failed to capture screenshot", Toast.LENGTH_SHORT).show()
+        }
+      }
+    }, handler)
+  }
+
+  /**
+   * Save the captured Bitmap as a PNG file and return its absolute path.
+   */
+  private fun saveScreenshot(bitmap: Bitmap): String? {
+    return try {
+      val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+      val fileName = "AR_Screenshot_$timestamp.png"
+      val directory = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+      if (directory != null && !directory.exists()) {
+        directory.mkdirs()
+      }
+      val file = File(directory, fileName)
+      val outputStream = FileOutputStream(file)
+      bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+      outputStream.flush()
+      outputStream.close()
+      file.absolutePath
+    } catch (e: Exception) {
+      e.printStackTrace()
+      null
+    }
+  }
+
+  private fun sendResultAndClose() {
+    val resultIntent = Intent()
+    resultIntent.putStringArrayListExtra("screenshots", ArrayList(screenshotPaths))
+    setResult(Activity.RESULT_OK, resultIntent)
+    finish() // Close AR Activity and return to Flutter
+  }
+
+  override fun onResume() {
+    super.onResume()
+    arFragment?.arSceneView?.session?.let { session ->
+      val config = session.config
+      config.focusMode = Config.FocusMode.AUTO // Explicitly enable autofocus
+      session.configure(config)
+      Log.d("ARMeasurementActivity", "Autofocus explicitly enabled in onResume()")
     }
   }
 

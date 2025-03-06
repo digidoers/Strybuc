@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math' as math;
 import 'dart:typed_data';
 import 'package:arkit_plugin/arkit_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:strybuc/theme.dart';
 import 'package:strybuc/widgets/confirmation_dialog.dart';
@@ -28,7 +30,7 @@ class _DistanceTrackingScreenState extends State<DistanceTrackingScreen> {
   ARKitNode? lineNode;
   vector.Vector3? lastPosition;
   String headingTitle = 'Hover over your product';
-  final List<Uint8List> _capturedImage = [];
+  final List<String> _capturedImage = [];
   List<String> addedNodes = [];
   vector.Vector3? startPosition;
   vector.Vector3? endPosition;
@@ -112,7 +114,7 @@ class _DistanceTrackingScreenState extends State<DistanceTrackingScreen> {
                           borderRadius: BorderRadius.circular(10),
                           image: _capturedImage.isNotEmpty
                               ? DecorationImage(
-                                  image: MemoryImage(_capturedImage.last),
+                                  image: FileImage(File(_capturedImage.last)),
                                   fit: BoxFit.cover,
                                 )
                               : null,
@@ -334,12 +336,24 @@ class _DistanceTrackingScreenState extends State<DistanceTrackingScreen> {
           await arKitController.snapshot(); // Returns MemoryImage
       var capturedImage = await arKitController.getCapturedImage();
       if (imageProvider is MemoryImage) {
+
+        // store file temporarily
+        final tempDir = await getTemporaryDirectory();
+        final String timestamp =
+            DateTime.now().millisecondsSinceEpoch.toString();
+        final File tempFile = File('${tempDir.path}/image_$timestamp.jpg');
+        Uint8List imageBytes = imageProvider.bytes;
+        await tempFile.writeAsBytes(imageBytes);
+        print('tempFile $tempFile');
+
         setState(() {
-          _capturedImage.add(imageProvider.bytes);
+          // _capturedImage.add(imageProvider.bytes);
+          _capturedImage.add(tempFile.path);
           headingTitle = '';
         });
-        await _saveCapturedImage();
+
         if (_capturedImage.length == 6) {
+        await _saveCapturedImage();
           _showLimitReachedDialog(context);
         }
         print('captured images length ${_capturedImage.length}');
@@ -365,7 +379,8 @@ class _DistanceTrackingScreenState extends State<DistanceTrackingScreen> {
       builder: (BuildContext context) {
         return ConfirmationDialog(
           title: 'Maximum photo reached',
-          message: 'You have reached the limit of ${_capturedImage.length} photos.',
+          message:
+              'You have reached the limit of ${_capturedImage.length} photos.',
           backgroundColor: Colors.white,
           firstButtonTitle: 'Edit Photos',
           firstButtonColor: Colors.white,
@@ -394,8 +409,9 @@ class _DistanceTrackingScreenState extends State<DistanceTrackingScreen> {
   Future<void> _saveCapturedImage() async {
     final prefs = await SharedPreferences.getInstance();
     // store captured images in shared preferences
-    await prefs.setStringList('captured_images',
-        _capturedImage.map((image) => base64Encode(image)).toList());
+    // await prefs.setStringList('captured_images',
+    //     _capturedImage.map((image) => base64Encode(image)).toList());
+    await prefs.setStringList('captured_images', _capturedImage);
   }
 
   void _resetARView() {

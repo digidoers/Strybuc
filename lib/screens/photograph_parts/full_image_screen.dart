@@ -1,12 +1,14 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:strybuc/theme.dart';
 import 'package:strybuc/widgets/confirmation_dialog.dart';
 
 class FullImageScreen extends StatelessWidget {
-  final Uint8List? imagePath;
+  final String? imagePath;
   final int index;
 
   const FullImageScreen({
@@ -23,7 +25,10 @@ class FullImageScreen extends StatelessWidget {
         children: [
           Expanded(
             child: Center(
-              child: Image.memory(imagePath!, fit: BoxFit.contain),
+              child: InteractiveViewer(
+                panEnabled: true,
+                maxScale: 5.0,
+                child: Image.file(File(imagePath!), fit: BoxFit.contain),),
             ),
           ),
           Container(
@@ -86,7 +91,14 @@ class FullImageScreen extends StatelessWidget {
           firstButtonOnPressed: () {
             Navigator.pop(context, true); // Go back to the gallery page
           },
-          secondButtonOnPressed: () => Navigator.pop(context, true),
+          secondButtonOnPressed: () async {
+            // update shared preferences and remove image
+            var prefs = await SharedPreferences.getInstance();
+            var images = prefs.getStringList('captured_images') ?? [];
+            images.removeAt(index);
+            await prefs.setStringList('captured_images', images);
+            Navigator.pop(context, true);
+          },
         );
       },
     ).then((shouldDelete) {

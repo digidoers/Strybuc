@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:strybuc/theme.dart'; // Assuming AppTheme is defined here
@@ -16,18 +17,17 @@ class PhotoGalleryRepScreen extends StatefulWidget {
 
 class _PhotoGalleryRepScreenState extends State<PhotoGalleryRepScreen> {
   List<String> images = [];
-  
+
   @override
-    void initState() {
+  void initState() {
     super.initState();
     _loadImagesFromPrefs(); // Load images from SharedPreferences when the screen opens
   }
 
-    /// Load images from SharedPreferences
+  /// Load images from SharedPreferences
   Future<void> _loadImagesFromPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String>? storedImages = prefs.getStringList('captured_images');
-
     if (storedImages != null) {
       setState(() {
         images = storedImages; // Set the loaded images
@@ -50,13 +50,14 @@ class _PhotoGalleryRepScreenState extends State<PhotoGalleryRepScreen> {
                   crossAxisSpacing: 8.0,
                   mainAxisSpacing: 8.0,
                 ),
-                itemCount: images.length < 6 ? images.length + 1 : 6, // Max 6 items
+                itemCount:
+                    images.length < 6 ? images.length + 1 : 6, // Max 6 items
                 itemBuilder: (context, index) {
                   if (index == 0 && images.length < 6) {
                     // Camera Box when images are less than 6
                     return GestureDetector(
                       onTap: () {
-                        context.pop('/photograph_parts/distance_tracking');
+                        context.push('/photograph_parts/distance_tracking');
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -66,9 +67,12 @@ class _PhotoGalleryRepScreenState extends State<PhotoGalleryRepScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: const [
-                            Icon(Icons.camera_alt, color: Colors.white, size: 40),
+                            Icon(Icons.camera_alt,
+                                color: Colors.white, size: 40),
                             SizedBox(height: 8),
-                            Text('Camera', style: TextStyle(color: Colors.white, fontSize: 16)),
+                            Text('Camera',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 16)),
                           ],
                         ),
                       ),
@@ -80,9 +84,12 @@ class _PhotoGalleryRepScreenState extends State<PhotoGalleryRepScreen> {
                       onTap: () async {
                         final bool? isDeleted = await context.push(
                           '/full_image_screen',
-                          extra: {'imagePath': base64Decode(images[imageIndex]), 'index': imageIndex},
+                          extra: {
+                            'imagePath': images[imageIndex],
+                            'index': imageIndex
+                          },
                         ) as bool?;
-                        
+
                         if (isDeleted == true) {
                           setState(() {
                             images.removeAt(imageIndex);
@@ -91,10 +98,11 @@ class _PhotoGalleryRepScreenState extends State<PhotoGalleryRepScreen> {
                       },
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10),
-                        child: Image.memory(
-                          base64Decode(images[imageIndex]),
-                          fit: BoxFit.cover,
-                        ),
+                        // child: Image.memory(
+                        //   base64Decode(images[imageIndex]),
+                        //   fit: BoxFit.cover,
+                        // ),
+                        child: Image.file(File(images[imageIndex]), fit: BoxFit.cover),
                       ),
                     );
                   }
@@ -121,7 +129,8 @@ class _PhotoGalleryRepScreenState extends State<PhotoGalleryRepScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).primaryColor,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                 ),
               ),
             ),
